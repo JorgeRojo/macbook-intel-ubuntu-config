@@ -24,5 +24,6 @@ Installation guides for Ubuntu on MacBooks with Intel chipset and T2 chip.
 - ✅ Teclado/trackpad internos (apple-bce via DKMS)
 - ✅ Touch Bar (hid-appletb-kbd/bl compilados manualmente)
 - ✅ NVIDIA driver 595.58.03 compilado e instalado
-- ⚠️ nvidia-smi — pendiente verificar tras fix de power management
+- ✅ nvidia-smi — RTX 3070 funcionando (compute/CUDA)
 - ❌ WiFi — requiere firmware extraído de macOS
+- ❌ Display desde eGPU — nvidia-modeset incompatible con TB3 (display usa GPUs internas)
