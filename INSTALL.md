@@ -332,7 +332,15 @@ Reiniciar Chrome completamente para que aplique.
 
 ---
 
-## Paso 9: Steam y gaming
+## Paso 9: Tienda de aplicaciones
+
+```bash
+sudo snap install snap-store
+```
+
+---
+
+## Paso 10: Steam y gaming
 
 ```bash
 sudo dpkg --add-architecture i386
@@ -351,7 +359,7 @@ DXVK_FILTER_DEVICE_NAME="RTX 3070" __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBR
 
 ---
 
-## Paso 10: Reiniciar y verificar
+## Paso 11: Reiniciar y verificar
 
 ```bash
 sudo update-initramfs -u -k 6.11.0-19-generic
