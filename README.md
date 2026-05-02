@@ -26,15 +26,23 @@ Installation guides for Ubuntu on MacBooks with Intel chipset and T2 chip.
 En Steam → Biblioteca → clic derecho en el juego → **Propiedades** → **Opciones de lanzamiento**:
 
 ```
-__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only %command%
+DXVK_FILTER_DEVICE_NAME="RTX 3070" __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only %command%
 ```
 
-Esto hace que el juego renderice en la RTX 3070 y muestre la imagen en el monitor conectado al Mac.
+**Importante:** `DXVK_FILTER_DEVICE_NAME="RTX 3070"` es necesario porque Vulkan enumera la AMD como GPU0. Sin esto, Proton/DXVK usa la AMD integrada.
 
-Para ver FPS, instalar `mangohud` y añadir al inicio:
+### Con contador de FPS (MangoHud):
 ```
-MANGOHUD=1 __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only mangohud %command%
+MANGOHUD=1 DXVK_FILTER_DEVICE_NAME="RTX 3070" __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only mangohud %command%
 ```
+
+### Verificar que funciona:
+Mientras el juego corre, ejecutar `nvidia-smi` — el proceso del juego debe aparecer usando la GPU.
+
+### Notas:
+- Las Launch Options se configuran **dentro de Steam** (no desde scripts bash)
+- Steam/Proton no hereda variables de entorno del proceso padre
+- Instalar MangoHud: `sudo apt install mangohud`
 
 ## Configuración clave
 

@@ -189,7 +189,14 @@ sudo apt install steam vulkan-tools libvulkan1 libvulkan1:i386 mesa-vulkan-drive
 En Steam → Propiedades del juego → Launch Options:
 
 ```
-__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only DXVK_HUD=fps %command%
+DXVK_FILTER_DEVICE_NAME="RTX 3070" __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only %command%
+```
+
+`DXVK_FILTER_DEVICE_NAME` es necesario porque Vulkan enumera la AMD como GPU0.
+
+Con MangoHud FPS (`sudo apt install mangohud`):
+```
+MANGOHUD=1 DXVK_FILTER_DEVICE_NAME="RTX 3070" __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only mangohud %command%
 ```
 
 ## 12. WiFi
