@@ -19,7 +19,7 @@ Installation guides for Ubuntu on MacBooks with Intel chipset and T2 chip.
 - ✅ Teclado/trackpad internos (apple-bce via DKMS)
 - ✅ Touch Bar (hid-appletb-kbd/bl compilados manualmente)
 - ✅ Steam + Proton instalados
-- ❌ WiFi — requiere firmware extraído de macOS (usar `sudo get-apple-firmware get_from_online`)
+- ✅ WiFi — Broadcom BCM4364 (firmware vía get-apple-firmware)
 
 ## Cómo jugar con la eGPU
 

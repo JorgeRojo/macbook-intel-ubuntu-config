@@ -192,14 +192,16 @@ En Steam → Propiedades del juego → Launch Options:
 __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only DXVK_HUD=fps %command%
 ```
 
-## 12. WiFi (opcional, requiere internet por cable)
+## 12. WiFi
 
 ```bash
 sudo apt install apple-firmware-script dmg2img -y
 sudo get-apple-firmware get_from_online
-# Seleccionar opción 7 (Sonoma)
+# Seleccionar opción 7 (Sonoma) - descarga ~600MB
 sudo reboot
 ```
+
+WiFi Broadcom BCM4364 funciona tras reiniciar. Conectar vía NetworkManager.
 
 ---
 
@@ -227,7 +229,6 @@ El monitor NO va conectado a la caja eGPU. Va a un puerto del Mac.
 ## Lo que NO funciona
 
 - Display directo desde la caja eGPU (nvidia-modeset timeout sobre TB3)
-- WiFi sin firmware de Apple
 - Kernels >6.11 con NVIDIA modeset (pantalla negra al arrancar)
 - Driver NVIDIA 535 (incompatible con kernel >6.4 en GPUs Ampere)
 - Driver NVIDIA 595-open (timeout de modeset)
