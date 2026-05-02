@@ -52,6 +52,8 @@ El monitor va conectado al Mac, NO a la caja eGPU. La RTX 3070 renderiza y enví
 
 Si ya tienes Ubuntu instalado y quieres ir directo a la configuración, sigue [INSTALL.md](INSTALL.md).
 
+Para configurar juegos con la eGPU, consulta [GAMING.md](GAMING.md).
+
 Si tienes problemas, consulta [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ## Gaming con eGPU
