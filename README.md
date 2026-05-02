@@ -1,3 +1,7 @@
+<picture>
+  <img src="banner.png" alt="Ubuntu 24.04 en MacBook Pro 2018 con eGPU NVIDIA">
+</picture>
+
 # Ubuntu 24.04 en MacBook Pro 2018 con eGPU NVIDIA
 
 Guía completa para instalar y configurar Ubuntu 24.04 en un MacBook Pro con chip T2, incluyendo eGPU NVIDIA para gaming vía Thunderbolt 3.
