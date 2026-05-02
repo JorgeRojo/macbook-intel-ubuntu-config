@@ -76,3 +76,23 @@ Monitor externo (3440x1440) ← DisplayPort → Puerto USB-C del Mac → AMD Rad
                                                                           ↑
                                                               NVIDIA RTX 3070 (eGPU vía TB3)
 ```
+
+## Benchmark confirmado
+
+```
+=======================================================
+ glmark2 2023.01
+=======================================================
+ OpenGL Information
+ GL_VENDOR: NVIDIA Corporation
+ GL_RENDERER: NVIDIA GeForce RTX 3070/PCIe/SSE2
+ GL_VERSION: 4.6.0 NVIDIA 595.58.03
+=======================================================
+[build] use-vbo=false: FPS: 766
+[build] use-vbo=true: FPS: 1483
+[texture] texture-filter=nearest: FPS: 1487
+[texture] texture-filter=linear: FPS: 1462
+[texture] texture-filter=mipmap: FPS: 1492
+```
+
+Rendimiento confirmado: ~1500 FPS en tests de textura (vs ~100-200 con AMD integrada).
