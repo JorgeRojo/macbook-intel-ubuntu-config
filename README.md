@@ -16,7 +16,7 @@ Installation guides for Ubuntu on MacBooks with Intel chipset and T2 chip.
 - ✅ Teclado/trackpad internos (apple-bce via DKMS)
 - ✅ Touch Bar (hid-appletb-kbd/bl compilados manualmente)
 - ✅ Arranque estable sin pantalla negra
-- ❌ Display desde eGPU — nvidia-modeset incompatible con TB3 (pendiente)
+- ✅ Display + Gaming — PRIME render offload (RTX 3070 renderiza, AMD muestra)
 - ❌ WiFi — requiere firmware extraído de macOS
 
 ## Documentación
@@ -55,5 +55,5 @@ options nvidia NVreg_PreserveVideoMemoryAllocations=0
 
 ## Pendiente
 
-- Activar display externo desde eGPU (requiere resolver timeout de nvidia-modeset sobre TB3)
+- Estabilizar arranque con modeset=1 (ocasionalmente falla)
 - WiFi (extraer firmware BCM4364 de macOS)
