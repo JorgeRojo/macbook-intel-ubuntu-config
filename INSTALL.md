@@ -306,6 +306,14 @@ sudo apt install steam mangohud vulkan-tools libvulkan1 libvulkan1:i386 \
   mesa-vulkan-drivers mesa-vulkan-drivers:i386 gamemode lib32gcc-s1 -y
 ```
 
+En cada juego → Propiedades → Opciones de lanzamiento:
+
+```
+DXVK_FILTER_DEVICE_NAME="RTX 3070" __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only %command%
+```
+
+> `DXVK_FILTER_DEVICE_NAME` es obligatorio porque Vulkan enumera la AMD como GPU0.
+
 ---
 
 ## Paso 9: Reiniciar y verificar
