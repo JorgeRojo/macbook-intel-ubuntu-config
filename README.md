@@ -1,97 +1,99 @@
-# MacBook Intel Ubuntu Config
+# Ubuntu 24.04 en MacBook Pro 2018 con eGPU NVIDIA
 
-Installation guides for Ubuntu on MacBooks with Intel chipset and T2 chip.
+Guía completa para instalar y configurar Ubuntu 24.04 en un MacBook Pro con chip T2, incluyendo eGPU NVIDIA para gaming vía Thunderbolt 3.
 
-## Hardware
+## Hardware probado
 
-- MacBook Pro 15,1 (2018, 15") — Intel i7-8750H
-- Apple T2 Security Chip
-- eGPU: NVIDIA RTX 3070 via Thunderbolt 3
-- Internal dGPU: AMD Radeon Pro 555X
-- Monitor: 3440x1440 ultrawide via DisplayPort (conectado al Mac)
+| Componente | Modelo |
+|---|---|
+| Portátil | MacBook Pro 15,1 (2018, 15") |
+| CPU | Intel Core i7-8750H |
+| Chip seguridad | Apple T2 |
+| GPU interna | AMD Radeon Pro 555X |
+| eGPU | NVIDIA RTX 3070 (Thunderbolt 3) |
+| WiFi | Broadcom BCM4364 |
 
-## Estado actual ✅
+## Qué funciona
 
-- ✅ Ubuntu 24.04 con kernel 6.11.0-19-generic
-- ✅ nvidia-smi — RTX 3070 funcionando (CUDA 13.2)
-- ✅ PRIME render offload — juegos acelerados con RTX 3070
-- ✅ Monitor externo 3440x1440 (vía AMD Radeon)
-- ✅ Teclado/trackpad internos (apple-bce via DKMS)
-- ✅ Touch Bar (hid-appletb-kbd/bl compilados manualmente)
-- ✅ Steam + Proton instalados
-- ✅ WiFi — Broadcom BCM4364 (firmware vía get-apple-firmware)
+| Componente | Estado | Driver |
+|---|---|---|
+| Teclado interno | ✅ | apple-bce (DKMS) |
+| Trackpad multitouch | ✅ | hid-magicmouse-t2 (compilado) |
+| Touch Bar | ✅ | hid-appletb-kbd/bl (compilado) |
+| WiFi | ✅ | brcmfmac (firmware Sonoma) |
+| eGPU NVIDIA | ✅ | nvidia-driver-595 + PRIME offload |
+| Monitor externo | ✅ | AMD 555X vía USB-C (3440x1440) |
+| Steam/Proton gaming | ✅ | DXVK → RTX 3070 |
+| Audio | ✅ | apple-bce |
 
-## Cómo jugar con la eGPU
+## Qué NO funciona
 
-En Steam → Biblioteca → clic derecho en el juego → **Propiedades** → **Opciones de lanzamiento**:
+- Display directo desde la caja eGPU (limitación firmware Apple TB3)
+- Kernels >6.11 con NVIDIA modeset (pantalla negra)
+- Driver NVIDIA 535 o nvidia-open (incompatibles)
+
+## Arquitectura
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ Monitor externo (3440x1440)                             │
+│     ↕ DisplayPort                                       │
+│ Puerto USB-C del Mac → AMD Radeon Pro 555X (display)    │
+│                              ↑                          │
+│                    PRIME render offload                  │
+│                              ↑                          │
+│ Thunderbolt 3 → RTX 3070 eGPU (renderizado 3D)         │
+└─────────────────────────────────────────────────────────┘
+```
+
+El monitor va conectado al Mac, NO a la caja eGPU. La RTX 3070 renderiza y envía los frames a la AMD vía PRIME offload.
+
+## Quick Start
+
+Si ya tienes Ubuntu instalado y quieres ir directo a la configuración, sigue [INSTALL.md](INSTALL.md).
+
+Si tienes problemas, consulta [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
+
+## Gaming con eGPU
+
+En Steam → Propiedades del juego → **Opciones de lanzamiento**:
 
 ```
 DXVK_FILTER_DEVICE_NAME="RTX 3070" __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only %command%
 ```
 
-**Importante:** `DXVK_FILTER_DEVICE_NAME="RTX 3070"` es necesario porque Vulkan enumera la AMD como GPU0. Sin esto, Proton/DXVK usa la AMD integrada.
-
-### Con contador de FPS (MangoHud):
+Con FPS overlay (MangoHud):
 ```
 MANGOHUD=1 DXVK_FILTER_DEVICE_NAME="RTX 3070" __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only mangohud %command%
 ```
 
-### Verificar que funciona:
-Mientras el juego corre, ejecutar `nvidia-smi` — el proceso del juego debe aparecer usando la GPU.
+> **Importante:** `DXVK_FILTER_DEVICE_NAME` es obligatorio porque Vulkan enumera la AMD como GPU0. Sin esto, Proton usa la AMD integrada.
 
-### Notas:
-- Las Launch Options se configuran **dentro de Steam** (no desde scripts bash)
-- Steam/Proton no hereda variables de entorno del proceso padre
-- Instalar MangoHud: `sudo apt install mangohud`
+> **Nota:** Las Launch Options se configuran dentro de Steam. Los scripts bash no funcionan porque Steam/Proton no hereda variables de entorno del proceso padre.
 
-## Configuración clave
+## Configuración del sistema
 
 ```bash
 # Kernel
-6.11.0-19-generic
+uname -r  →  6.11.0-19-generic
 
-# GRUB
-GRUB_DEFAULT=0
+# GRUB (/etc/default/grub)
 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash pci=realloc,hpmmioprefsize=2G ibt=off"
 GRUB_CMDLINE_LINUX="pm_async=off intel_iommu=on iommu=pt"
 
-# /etc/modprobe.d/nvidia-graphics-drivers-kms.conf
+# NVIDIA (/etc/modprobe.d/)
 options nvidia_drm modeset=1
-
-# /etc/modprobe.d/nvidia-egpu.conf
 options nvidia NVreg_DynamicPowerManagement=0x00
 options nvidia NVreg_PreserveVideoMemoryAllocations=0
 
-# Xorg nvidia configs DISABLED
-/usr/share/X11/xorg.conf.d/10-nvidia.conf.disabled
+# Xorg nvidia configs → DESACTIVADOS (.disabled)
 
-# Módulos cargados al arranque
-/etc/modules-load.d/t2.conf → apple-bce
-/etc/modules-load.d/appletb.conf → hid-appletb-bl, hid-appletb-kbd
+# Módulos al arranque (/etc/modules-load.d/)
+apple-bce
+hid-appletb-bl, hid-appletb-kbd
+hid-apple-t2, hid-magicmouse-t2
 ```
 
-## Documentación
+## Licencia
 
-| Documento | Descripción |
-|---|---|
-| [EGPU_INSTALL_GUIDE.md](EGPU_INSTALL_GUIDE.md) | Guía paso a paso para reproducir la instalación |
-| [EGPU_SETUP_SUMMARY.md](EGPU_SETUP_SUMMARY.md) | Resumen de la configuración final |
-| [EGPU_TECHNICAL_DETAILS.md](EGPU_TECHNICAL_DETAILS.md) | Parches de código y detalles técnicos |
-| [EGPU_TROUBLESHOOTING_HISTORY.md](EGPU_TROUBLESHOOTING_HISTORY.md) | Historial de intentos y errores |
-| [EGPU_SESSION_2_FIX.md](EGPU_SESSION_2_FIX.md) | Compilación NVIDIA + appletb para kernel 6.11 |
-| [EGPU_SESSION_3_DRIVER_CHANGE.md](EGPU_SESSION_3_DRIVER_CHANGE.md) | Cambio de nvidia-open a propietario |
-| [EGPU_SESSION_4_MODESET_FIX.md](EGPU_SESSION_4_MODESET_FIX.md) | Fix timeout nvidia-modeset |
-| [EGPU_SESSION_5_DISPLAY_ATTEMPT.md](EGPU_SESSION_5_DISPLAY_ATTEMPT.md) | Intento de display desde eGPU |
-| [EGPU_SESSION_6_MODESET_ZERO.md](EGPU_SESSION_6_MODESET_ZERO.md) | Fix arranque con modeset=0 |
-| [EGPU_SESSION_7_GRUB_XORG_FIX.md](EGPU_SESSION_7_GRUB_XORG_FIX.md) | Fix GRUB_DEFAULT y Xorg nvidia |
-| [EGPU_SESSION_8_XORG_EGPU.md](EGPU_SESSION_8_XORG_EGPU.md) | Intento Xorg eGPU con delay |
-| [EGPU_SESSION_9_SUCCESS.md](EGPU_SESSION_9_SUCCESS.md) | ¡ÉXITO! PRIME render offload funcionando |
-| [EGPU_SESSION_10_KERNEL_6.17.md](EGPU_SESSION_10_KERNEL_6.17.md) | Intento kernel 6.17 (falló - pantalla negra) |
-| [PLAN_KERNEL_6.17_MIGRATION.md](PLAN_KERNEL_6.17_MIGRATION.md) | Plan de migración (no viable por modeset) |
-
-## Notas importantes
-
-- **modeset=1 es intermitente**: a veces el arranque falla con pantalla negra. Un segundo reinicio suele funcionar.
-- **Kernel 6.17 no funciona**: nvidia-modeset timeout con módulos precompilados. Quedarse en 6.11.
-- **Driver 535 no funciona**: incompatible con kernel >6.4 en GPUs Ampere.
-- **Si se actualiza nvidia-driver**: verificar que `modeset=1` no se sobreescriba y que `10-nvidia.conf` siga desactivado.
+Este proyecto es documentación libre. Úsala, modifícala, compártela.
