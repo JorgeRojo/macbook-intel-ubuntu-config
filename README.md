@@ -23,14 +23,18 @@ Installation guides for Ubuntu on MacBooks with Intel chipset and T2 chip.
 
 ## Cómo jugar con la eGPU
 
-En Steam → Propiedades del juego → Launch Options:
+En Steam → Biblioteca → clic derecho en el juego → **Propiedades** → **Opciones de lanzamiento**:
+
 ```
-__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only DXVK_HUD=fps %command%
+__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only %command%
 ```
 
-O usar los scripts:
-- `~/LiesOfP.sh` — con eGPU RTX 3070
-- `~/LiesOfP_noegpu.sh` — con AMD integrada (para comparar)
+Esto hace que el juego renderice en la RTX 3070 y muestre la imagen en el monitor conectado al Mac.
+
+Para ver FPS, instalar `mangohud` y añadir al inicio:
+```
+MANGOHUD=1 __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only mangohud %command%
+```
 
 ## Configuración clave
 
