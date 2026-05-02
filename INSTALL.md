@@ -297,7 +297,42 @@ sudo get-apple-firmware get_from_online
 
 ---
 
-## Paso 8: Steam y gaming
+## Paso 8: Gestos del trackpad
+
+### Gestos nativos (GNOME 46 Wayland)
+
+```bash
+# Natural scrolling (como Mac)
+gsettings set org.gnome.desktop.peripherals.touchpad natural-scroll true
+gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
+gsettings set org.gnome.desktop.peripherals.touchpad two-finger-scrolling-enabled true
+gsettings set org.gnome.desktop.peripherals.touchpad speed 0.3
+```
+
+Gestos disponibles sin configuración extra:
+- 2 dedos scroll → scroll (natural, como Mac)
+- 2 dedos tap → clic derecho
+- 3 dedos izq/der → cambiar workspace
+- 3 dedos arriba → vista de actividades
+- 3 dedos abajo → app grid
+
+### Swipe atrás/adelante en Chrome
+
+Chrome necesita un flag para activar el gesto de 2 dedos horizontal (atrás/adelante):
+
+```bash
+cp /usr/share/applications/google-chrome.desktop ~/.local/share/applications/google-chrome.desktop
+sed -i 's|Exec=/usr/bin/google-chrome-stable|Exec=/usr/bin/google-chrome-stable --enable-features=TouchpadOverscrollHistoryNavigation|g' \
+  ~/.local/share/applications/google-chrome.desktop
+```
+
+Reiniciar Chrome completamente para que aplique.
+
+> En Firefox funciona de serie sin configuración extra.
+
+---
+
+## Paso 9: Steam y gaming
 
 ```bash
 sudo dpkg --add-architecture i386
@@ -316,7 +351,7 @@ DXVK_FILTER_DEVICE_NAME="RTX 3070" __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBR
 
 ---
 
-## Paso 9: Reiniciar y verificar
+## Paso 10: Reiniciar y verificar
 
 ```bash
 sudo update-initramfs -u -k 6.11.0-19-generic
