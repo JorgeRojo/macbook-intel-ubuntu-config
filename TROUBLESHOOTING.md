@@ -4,6 +4,20 @@ Problemas conocidos y soluciones para Ubuntu 24.04 en MacBook Pro 2018 con eGPU 
 
 ---
 
+## El cursor del ratón desaparece
+
+**Causa:** Glitch del compositor GNOME Wayland con el renderer Vulkan.
+
+**Fix rápido:** Pulsar `Ctrl+Alt+F4` y luego `Ctrl+Alt+F2` (cambia a TTY y vuelve).
+
+**Fix permanente:**
+```bash
+echo "GSK_RENDERER=gl" | sudo tee -a /etc/environment
+```
+Reiniciar sesión para aplicar.
+
+---
+
 ## Pantalla negra al arrancar
 
 **Causa:** nvidia-modeset timeout (`0x0000c67d`) al inicializar la eGPU sobre Thunderbolt 3.
