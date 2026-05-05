@@ -73,8 +73,8 @@ Parámetros vitales para que el bus Thunderbolt asigne memoria a la gráfica y e
 
 ### Editar `/etc/default/grub`:
 Asegurar que la línea `GRUB_CMDLINE_LINUX_DEFAULT` incluya:
-- `pci=assign-busses,realloc`: Fuerza al kernel a reasignar los recursos PCI ignorando el firmware de Apple.
-- `hpmmioprefsize=8G,hpmemsize=256M`: Reserva 8GB para la eGPU (vital para Vulkan y serie 4000).
+- `pci=assign-busses,realloc,nocrs`: Fuerza la reasignación total de recursos e ignora los límites ACPI restrictivos (vital para grandes asignaciones).
+- `hpmmioprefsize=32G,hpmemsize=256M`: Reserva 32GB para la eGPU (máximo rendimiento, permite ReBAR total en la serie 4000).
 - `pcie_aspm=off`: Desactiva el ahorro de energía PCIe (evita errores de "GPU progress").
 - `ibt=off`: Desactiva Indirect Branch Tracking (necesario para drivers NVIDIA).
 - `intel_iommu=on iommu=pt`: Optimiza el passthrough de la eGPU.
