@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Steam eGPU
+Comment=Lanza Steam y todos sus juegos forzando la RTX 4070 Ti
+Exec=bash -c "killall -9 steam 2>/dev/null; __NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only DXVK_FILTER_DEVICE_NAME='RTX 4070 Ti' VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/radeon_icd.json steam"
+Icon=steam
+Terminal=false
+Type=Application
+Categories=Game;

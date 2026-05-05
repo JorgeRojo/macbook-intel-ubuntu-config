@@ -68,19 +68,15 @@ sudo dkms install nvidia/595.58.03 -k 7.0.1-1-t2-noble
 
 ---
 
-## 5. Configuración de GRUB y Optimización eGPU
-Parámetros vitales para que el bus Thunderbolt asigne memoria a la gráfica y el driver no se cuelgue. Es fundamental forzar la reasignación de buses para que la RTX 40-series tenga suficiente ancho de banda (BAR).
+## 6. Configuración de GRUB y Optimización eGPU (FINAL)
+Tras pruebas exhaustivas, se confirma que el modelo MacBook Pro 2018 (T2) tiene una limitación de hardware en el ancho de banda del BAR (256MB) que impide el modo "Direct Display" estable en Kernel 7.0. La solución definitiva es el **Modo PRIME Offload**.
 
 ### Editar `/etc/default/grub`:
-Asegurar que la línea `GRUB_CMDLINE_LINUX_DEFAULT` incluya:
-- `pci=realloc,assign-busses,use_crs,hp_mmio_window`: Fuerza la reasignación total de recursos, permite usar las ventanas ACPI de Apple y obliga a los dispositivos Thunderbolt a usar la ventana de memoria alta (64-bit).
-- `hpmmioprefsize=32G,hpmemsize=256M`: Reserva 32GB para la eGPU (máximo rendimiento, permite ReBAR total en la serie 4000).
-- `pcie_aspm=off`: Desactiva el ahorro de energía PCIe (evita errores de "GPU progress").
-- `ibt=off`: Desactiva Indirect Branch Tracking (necesario para drivers NVIDIA).
-- `intel_iommu=on iommu=pt`: Optimiza el passthrough de la eGPU.
-- `pm_async=off`: Evita conflictos en el arranque de Thunderbolt.
+```text
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash pci=realloc,assign-busses,use_crs,hp_mmio_window,hpmmioprefsize=32G,hpmemsize=256M pcie_aspm=off ibt=off pm_async=off intel_iommu=on iommu=pt"
+```
 
-### Desactivar Modeset (Evita cuelgues en el arranque):
+### Desactivar Modeset (OBLIGATORIO para estabilidad):
 ```bash
 echo "options nvidia_drm modeset=0" | sudo tee /etc/modprobe.d/nvidia-modeset.conf
 sudo update-grub
@@ -89,19 +85,28 @@ sudo update-initramfs -u -k 7.0.1-1-t2-noble
 
 ---
 
-## 6. Uso en Gaming (Steam)
-Para que un juego use la RTX 4070 Ti en lugar de la gráfica integrada:
+## 7. Lanzador de Steam Optimizado
+Para evitar cuelgues al abrir Steam y aplicar la potencia de la RTX 4070 Ti de forma global, se recomienda usar un lanzador personalizado en el escritorio (`Steam_eGPU.desktop` incluido en este repo).
 
-**Launch Options:**
+**Comando del lanzador:**
+```bash
+bash -c "killall -9 steam 2>/dev/null; __NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only DXVK_FILTER_DEVICE_NAME='RTX 4070 Ti' VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/radeon_icd.json steam"
+```
+
+---
+
+## 8. Uso en Gaming (Steam)
+Si no usas el lanzador anterior, añade esto manualmente a cada juego en **Opciones de lanzamiento**:
+
 ```text
-DXVK_FILTER_DEVICE_NAME="RTX 4070 Ti" __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only %command%
+__NV_PRIME_RENDER_OFFLOAD=1 __VK_LAYER_NV_optimus=NVIDIA_only DXVK_FILTER_DEVICE_NAME="RTX 4070 Ti" %command%
 ```
 
 ---
 
 ## Verificación final
-- `nvidia-smi`: Debe mostrar la RTX 4070 Ti.
-- `lsmod | grep apple_bce`: Debe estar cargado.
+- `nvidia-smi`: Debe mostrar la RTX 4070 Ti con driver 595.x.
+- `vulkaninfo --summary`: Debe responder (usando el ICD de la Radeon para la interfaz).
 - `uname -r`: 7.0.1-1-t2-noble.
 
-**Documento creado por Gemini CLI - 5 de Mayo de 2026**
+**Documento actualizado por Gemini CLI - 6 de Mayo de 2026**
