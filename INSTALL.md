@@ -417,3 +417,63 @@ Verificar después de cada actualización:
 cat /etc/modprobe.d/nvidia-graphics-drivers-kms.conf  # → modeset=1
 ls /usr/share/X11/xorg.conf.d/10-nvidia.conf          # → NO debe existir (solo .disabled)
 ```
+
+---
+
+## Anexo: Compilación NVIDIA en Kernel 7.0 (T2)
+
+Si usas un kernel **7.0.x-t2-noble** o superior, el driver oficial fallará al compilar debido a errores de \`objtool\` (naked returns / MITIGATION_RETHUNK). Sigue estos pasos para parchearlo manualmente:
+
+### 1. Preparar el driver
+Instala el driver (fallará la configuración inicial, es normal):
+\`\`\`bash
+sudo apt install nvidia-driver-595
+\`\`\`
+
+### 2. Parchear Kbuild y Makefile
+Debemos decirles a los scripts de compilación de NVIDIA que ignoren las validaciones de \`objtool\` que el kernel 7.0 impone de forma estricta.
+
+\`\`\`bash
+# Entrar al directorio del source (ajustar versión si cambia)
+cd /usr/src/nvidia-595.58.03/
+
+# Insertar bypass en Kbuild y Makefile
+sudo sed -i '1i OBJECT_FILES_NON_STANDARD := y' Kbuild
+sudo sed -i '1i OBJECT_FILES_NON_STANDARD := y' Makefile
+sudo sed -i '1i OBJECT_FILES_NON_STANDARD_nvidia.o := y' Makefile
+\`\`\`
+
+### 3. Modificar DKMS para desactivar Objtool
+Editamos el archivo de configuración de DKMS para pasar flags adicionales al compilador:
+
+\`\`\`bash
+sudo sed -i 's/CONFIG_X86_KERNEL_IBT=/CONFIG_X86_KERNEL_IBT= CONFIG_OBJTOOL=n CONFIG_OBJTOOL_WERROR=n/g' dkms.conf
+\`\`\`
+
+### 4. Compilar e Instalar
+Ahora forzamos la reconstrucción del módulo para el kernel 7.0 (sustituye el nombre del kernel si es necesario):
+
+\`\`\`bash
+sudo dkms build nvidia/595.58.03 -k 7.0.3-1-t2-noble
+sudo dkms install nvidia/595.58.03 -k 7.0.3-1-t2-noble
+sudo update-initramfs -u -k 7.0.3-1-t2-noble
+\`\`\`
+
+### 5. Reiniciar
+Una vez instalado, reinicia. Al arrancar, verifica con:
+\`\`\`bash
+nvidia-smi
+\`\`\`
+
+### 6. Touch Bar en Kernel 7.0+
+En kernels modernos como el 7.0, el macro \`timer_container_of\` o \`from_timer\` puede fallar si no se usa correctamente. La solución que aplicamos fue:
+
+1. **Parche de Timer**: Cambiar la inicialización del timer en \`hid-appletb-kbd.c\`:
+   - Buscar: \`struct appletb_kbd *kbd = from_timer(kbd, t, inactivity_timer);\`
+   - Cambiar por: \`struct appletb_kbd *kbd = container_of(t, struct appletb_kbd, inactivity_timer);\`
+
+2. **Helper de búsqueda**: Asegurarse de incluir la función \`appletb_find_field\` (incluida en el paso 3 de esta guía) y realizar el reemplazo de \`hid_find_field\` por \`appletb_find_field\`.
+
+---
+
+**Nota sobre el Trackpad:** En Kernel 7.0, los parches actuales de \`hid-core.c\` entran en conflicto con la nueva arquitectura del sistema HID de Linux. Se recomienda usar los drivers genéricos o esperar a una actualización oficial de los parches T2 para esta versión del kernel.
