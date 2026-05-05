@@ -69,14 +69,16 @@ sudo dkms install nvidia/595.58.03 -k 7.0.1-1-t2-noble
 ---
 
 ## 5. Configuración de GRUB y Optimización eGPU
-Parámetros vitales para que el bus Thunderbolt asigne memoria a la gráfica y el driver no se cuelgue.
+Parámetros vitales para que el bus Thunderbolt asigne memoria a la gráfica y el driver no se cuelgue. Es fundamental forzar la reasignación de buses para que la RTX 40-series tenga suficiente ancho de banda (BAR).
 
 ### Editar `/etc/default/grub`:
 Asegurar que la línea `GRUB_CMDLINE_LINUX_DEFAULT` incluya:
-- `pci=realloc`: Reasigna buses PCI.
-- `hpmmioprefsize=4G`: Reserva 4GB para la eGPU (necesario para la serie 4000).
+- `pci=assign-busses,realloc`: Fuerza al kernel a reasignar los recursos PCI ignorando el firmware de Apple.
+- `hpmmioprefsize=8G,hpmemsize=256M`: Reserva 8GB para la eGPU (vital para Vulkan y serie 4000).
+- `pcie_aspm=off`: Desactiva el ahorro de energía PCIe (evita errores de "GPU progress").
 - `ibt=off`: Desactiva Indirect Branch Tracking (necesario para drivers NVIDIA).
 - `intel_iommu=on iommu=pt`: Optimiza el passthrough de la eGPU.
+- `pm_async=off`: Evita conflictos en el arranque de Thunderbolt.
 
 ### Desactivar Modeset (Evita cuelgues en el arranque):
 ```bash

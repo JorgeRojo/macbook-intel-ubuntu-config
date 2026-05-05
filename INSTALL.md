@@ -274,16 +274,18 @@ sudo mv /usr/share/X11/xorg.conf.d/11-nvidia-offload.conf /usr/share/X11/xorg.co
 ## Paso 6: GRUB
 
 ```bash
-sudo sed -i 's|GRUB_CMDLINE_LINUX_DEFAULT=.*|GRUB_CMDLINE_LINUX_DEFAULT="quiet splash pci=realloc,hpmmioprefsize=2G ibt=off"|' /etc/default/grub
+sudo sed -i 's|GRUB_CMDLINE_LINUX_DEFAULT=.*|GRUB_CMDLINE_LINUX_DEFAULT="quiet splash pci=assign-busses,realloc,hpmmioprefsize=8G,hpmemsize=256M pcie_aspm=off ibt=off"|' /etc/default/grub
 sudo sed -i 's|GRUB_CMDLINE_LINUX=.*|GRUB_CMDLINE_LINUX="pm_async=off intel_iommu=on iommu=pt"|' /etc/default/grub
 sudo update-grub
 ```
 
 Parámetros explicados:
-- `pci=realloc,hpmmioprefsize=2G` — Asigna espacio MMIO suficiente para la eGPU en TB3
-- `ibt=off` — Desactiva Indirect Branch Tracking (incompatible con NVIDIA)
-- `intel_iommu=on iommu=pt` — IOMMU en passthrough para eGPU
-- `pm_async=off` — Evita race conditions al inicializar TB3
+- `pci=assign-busses,realloc` — Fuerza al kernel a reasignar los recursos PCI, vital si el firmware del Mac reserva poco espacio.
+- `hpmmioprefsize=8G` — Reserva 8GB para la eGPU (necesario para RTX serie 4000).
+- `pcie_aspm=off` — Evita cuelgues de sincronización ("GPU progress") desactivando ahorro de energía.
+- `ibt=off` — Desactiva Indirect Branch Tracking (incompatible con NVIDIA).
+- `intel_iommu=on iommu=pt` — IOMMU en passthrough para eGPU.
+- `pm_async=off` — Evita race conditions al inicializar TB3.
 
 ---
 
