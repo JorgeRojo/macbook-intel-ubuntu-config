@@ -73,7 +73,7 @@ Parámetros vitales para que el bus Thunderbolt asigne memoria a la gráfica y e
 
 ### Editar `/etc/default/grub`:
 Asegurar que la línea `GRUB_CMDLINE_LINUX_DEFAULT` incluya:
-- `pci=realloc,assign-busses,use_crs`: Fuerza la reasignación total de recursos y permite al kernel usar las ventanas de memoria ACPI de Apple (vital para salir del límite de 256MB).
+- `pci=realloc,assign-busses,use_crs,hp_mmio_window`: Fuerza la reasignación total de recursos, permite usar las ventanas ACPI de Apple y obliga a los dispositivos Thunderbolt a usar la ventana de memoria alta (64-bit).
 - `hpmmioprefsize=32G,hpmemsize=256M`: Reserva 32GB para la eGPU (máximo rendimiento, permite ReBAR total en la serie 4000).
 - `pcie_aspm=off`: Desactiva el ahorro de energía PCIe (evita errores de "GPU progress").
 - `ibt=off`: Desactiva Indirect Branch Tracking (necesario para drivers NVIDIA).
